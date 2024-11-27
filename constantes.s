@@ -3,6 +3,8 @@
 .equ WSPACE_UART_MASK, 0xFFFF
 .equ DATA_UART_MASK, 0x00FF
 .equ ENTER_ASCII_VALUE, 0xA
+.equ RED_LED_ADDRESS, 0x10000000
+
 
 .org	0x500
   INIT_TEXT:
@@ -24,7 +26,7 @@
 
 
   vetor:
-    .skip 402
+    .skip 102
   posicaoVetor:
     .byte 0
   comando:

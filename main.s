@@ -23,8 +23,3 @@ _start:
     popR r4
     call	_terminal
     br READ_TERMINAL
-
-
-
-
-
