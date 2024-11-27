@@ -7,15 +7,7 @@ r19 -
 r20 - 
 */
 
-.macro pushR reg
-	addi sp,sp,-4
-	stw \reg,0(sp)
-.endm
-
-.macro popR reg
-	ldw \reg,0(sp)
-	addi sp,sp,4
-.endm
+.include "stack.s"
 
 .equ		STACK,		0x10000
 
