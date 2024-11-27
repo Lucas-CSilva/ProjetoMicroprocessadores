@@ -7,9 +7,13 @@ r11 - uart-control
 r12 - uart-wsapce
 */ 
 
+.include "stack.s"
+.include "constantes.s"
+
 .global _print_text
 _print_text:
-    ldw r9, (sp)           # Carrega o endereço da string que está na pilha
+    push
+    ldw r9, 40(sp)           # Carrega o endereço da string que está na pilha
 
     movia r8, UART_ADDRESS   # Move o endereço da JTAG UART para r8
 POLLING_ESCRITA:
@@ -26,6 +30,7 @@ POLLING_ESCRITA:
     br POLLING_ESCRITA      # Continua o loop para o próximo byte
 
 END_PRINT_TEXT:
+    pop
     ret                      # Retorna da subrotina
 
 

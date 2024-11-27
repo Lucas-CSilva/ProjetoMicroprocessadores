@@ -8,6 +8,7 @@ r20 -
 */
 
 .include "stack.s"
+.include "constantes.s"
 
 .equ		STACK,		0x10000
 
@@ -23,6 +24,7 @@ _start:
     call	_terminal
     br READ_TERMINAL
 
-.data
-  INIT_TEXT:
-  .asciz "Entre com o comando:"
+
+
+
+
