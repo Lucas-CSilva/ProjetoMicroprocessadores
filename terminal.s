@@ -109,9 +109,12 @@ _read_comand:
   br fim_read_comand
 
   comando_iniciar_animacao:
-  call _iniciar_animacao_leds
-  br fim_read_comand
+  movia r11, animacao_enabled
+  movi r12, 1
+  stb r12, (r11)
 
+  br fim_read_comand
+  
   fim_read_comand:
   call _flush
   pop
