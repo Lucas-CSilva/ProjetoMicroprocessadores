@@ -88,7 +88,6 @@ _read_comand:
   popR r9
   popR r8
   bne r4, r0, comando_apagar_led
-  bne r4, r0, comando_acender_led
 
   movia r9, COMANDO_INICIAR_ANIMACAO
   pushR r8
@@ -97,6 +96,22 @@ _read_comand:
   popR r9
   popR r8
   bne r4, r0, comando_iniciar_animacao
+
+  movia r9, COMANDO_PARAR_ANIMACAO
+  pushR r8
+  pushR r9
+  call _check_comand
+  popR r9
+  popR r8
+  bne r4, r0, comando_parar_animacao
+
+  movia r9, COMANDO_INICIAR_CRONOMETRO
+  pushR r8
+  pushR r9
+  call _check_comand
+  popR r9
+  popR r8
+  bne r4, r0, comando_iniciar_cronometro
 
   br fim_read_comand
 
@@ -109,10 +124,22 @@ _read_comand:
   br fim_read_comand
 
   comando_iniciar_animacao:
+  movia r13, RED_LED_ADDRESS
+  stwio r0, (r13)
   movia r11, animacao_enabled
   movi r12, 1
   stb r12, (r11)
+  br fim_read_comand
 
+  comando_parar_animacao:
+  movia r11, animacao_enabled
+  stb r0, (r11)
+  br fim_read_comand
+
+  comando_iniciar_cronometro:
+  movia r11, cronometro_enabled #carrega a flag para determinar se o cronometro esta ativo
+  movi r12, 1 #move 1 para o registrador
+  stb r12, (r11) #ativa a flag para determinar que o cronometro esta ativo
   br fim_read_comand
   
   fim_read_comand:

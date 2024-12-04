@@ -11,10 +11,8 @@ _enable_interruption:
   #rdctl r9, ienable
   # or r8, r8, r9
 
-  movi r9, 0b11 # máscara para habilitar interrupção do timer e pushbutton
+  movi r9, 0b111 # máscara para habilitar interrupção do timer e pushbutton
   wrctl ienable, r9
-
-
 
   movia r10, TIMER
 
@@ -29,7 +27,7 @@ _enable_interruption:
 
   movia r23, PUSHBUTTON
   movi r16, 0b10 # máscara para habilitar o pushbutton KEY1
-  stwio r16, (r23)
+  stwio r16, 8(r23)
 
   pop
   ret

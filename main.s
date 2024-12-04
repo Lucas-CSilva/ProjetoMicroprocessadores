@@ -18,11 +18,16 @@ r20 -
   rdctl	et, ipending
   beq et, r0, OTHER_EXCEPTIONS
   subi ea, ea, 4
-  andi r8, et, 1
-  bne r8, r0, TRATAR_TIMER
-  call TRATAR_PUSH_BUTTON
+  andi r8, et, 2
+  bne r8, r0, TRATAR_PUSHBUTTON
 
+  CONTINUAR_INTERRUPCAO:
+  andi r8, et, 1
+  bne r8, r0, TRATAR_INTERRUPCAO
+  
   END_HANDLER:
+    # movia r10, TIMER
+    # stb r0, 0(r10)
     pop
     eret
 
@@ -31,19 +36,47 @@ r20 -
   OTHER_EXCEPTIONS:
     br END_HANDLER
 
-  TRATAR_PUSH_BUTTON:
-    ret
-
-  TRATAR_TIMER:
+  TRATAR_INTERRUPCAO:
     movia r9, animacao_enabled
-    beq r9, r0, END_HANDLER
+    ldb r9, (r9)
+    beq r9, r0, JMP_CALL_ANIMCAO
     call _iniciar_animacao
-    movia r10, TIMER
-    stb r0, 0(r10)
+    JMP_CALL_ANIMCAO:
+
+    movia r9, cronometro_enabled
+    ldb r9, (r9)
+    beq r9, r0, JMP_CALL_CRONOMETRO
+    movia r11, count_temporizador #aumenta o contador referente ao cronometro. Sempre que uma interrupcao eh disparada quer dizer que se passaram 200ms 
+    ldb r12, (r11) #carrega o valor do contador em memoria
+    addi r12, r12, 1 #incrementa o valor
+    stb r12, (r11)
+    movi r13, 1 #move 5 para um registrador. Caso o contador seja 5 quer dizer que se passou 1s
+    bne r12, r13, JMP_CALL_CRONOMETRO #caso 1s tenha se passado chama o cronometro
+    stb r0, (r11) #zera o contador do cronometro
+    call _cronometro_handler
+    JMP_CALL_CRONOMETRO:
+    
+    movia r10, TIMER #zera o timer
+    stb r0, 0(r10) #zera o timer
     br END_HANDLER
+
+  TRATAR_PUSHBUTTON:
+    movia r2, 0x10000040
+    movia r3, 0x10000010
+    movia r4, 0x10000050
+
+    ldwio r14, 8(r4)         # carrega valor key2
+    andi r14, r14, 0b010       # aplica mascara 
+    beq r14, r0, CONTINUAR_INTERRUPCAO  # se = 0, KEY1 não foi pressionado
+
+    movia r9, cronometro_enabled
+    ldb r13, (r9)
+    xori r13, r13, 1
+    stb r13, (r9)
+
+    stwio r0, 12(r4)
+    br CONTINUAR_INTERRUPCAO
   
-
-
 
 .global _start
 _start:
@@ -95,7 +128,9 @@ _start:
   COMANDO_CANCELAR_CRONOMETRO:
 		.asciz "21"
 
-
+  .global cod_sete_segmentos
+  cod_sete_segmentos:
+    .byte 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f 
 
   .global vetor
   vetor:
@@ -119,4 +154,24 @@ _start:
 
   .global count_temporizador
   count_temporizador:
+    .byte 0
+
+  .global cronometro_enabled
+  cronometro_enabled:
+    .byte 0
+  
+  .global _current_unid_time
+  _current_unid_time:
+    .byte 0
+
+  .global _current_dez_time
+  _current_dez_time:
+    .byte 0
+
+  .global _current_cent_time
+  _current_cent_time:
+    .byte 0
+
+  .global _current_mil_time
+  _current_mil_time:
     .byte 0

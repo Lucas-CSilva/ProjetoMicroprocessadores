@@ -30,30 +30,24 @@ _iniciar_animacao:
     # Apaga o LED atual
     xor r10, r10, r14
 
+
     # Move para a esquerda ou para a direita
     beq r13, r12, mover_direita    # Se o switch indica direita, move para a direita
     br mover_esquerda              # Caso contrário, move para a esquerda
 
     mover_direita:
-    # beq r14, r0, case_primeiro_led 
-    
     srli r14, r14, 1           # Move a máscara para a direita
     br atualizar_led
 
-    # case_primeiro_led:
-    # movi r14, 0x10000           # Move a máscara para o led 17
-    # br atualizar_led
-
     mover_esquerda:
-    # movia r15, 17
-    # beq r14, r15, case_ultimo_led
-  
-    slli r14, r14, 1 # Move a máscara para a esquerda
-    br atualizar_led           
-    
-    # case_ultimo_led:
-    # movi r14, 1           # Move a máscara para a esquerda
+    slli r14, r14, 1               # Move a máscara para a esquerda
+    movia r15, 0b10000000000000000000             # Valor correspondente ao LED mais à esquerda (18º LED)
+    beq r14, r15, reiniciar_esquerda # Se excedeu o limite, reinicia no LED 1
+    br atualizar_led
 
+    reiniciar_esquerda:
+    movia r14, 1                   # Volta para o LED mais à direita (bit menos significativo)
+    br atualizar_led
 
     atualizar_led:
     or r10, r10, r14           # Acende o LED correspondente
@@ -61,5 +55,5 @@ _iniciar_animacao:
     br END_INICIAR_ANIMACAO
 
     END_INICIAR_ANIMACAO:
-        pop
-        ret
+    pop
+    ret
